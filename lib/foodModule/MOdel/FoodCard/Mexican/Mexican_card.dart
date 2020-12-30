@@ -1,0 +1,172 @@
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:norwayfinalcustomer/foodModule/Widget/Component/Color/color.dart';
+import 'package:norwayfinalcustomer/foodModule/Widget/Component/Style/style.dart';
+
+
+
+import 'Mexican.dart';
+
+class MexicanCard extends StatefulWidget {
+  final Mexican mexican;
+  final int ind;
+
+
+  const MexicanCard({Key key, this.ind, this.mexican}) : super(key: key);
+  @override
+  MexicanCards createState() => MexicanCards(this.mexican);
+}
+
+class MexicanCards extends State<MexicanCard> {
+  bool isSwitched = false;
+  final Mexican mexican;
+  int _itemCount=0;
+  @override
+  void initState() {
+    // TODO: implement initState
+
+    // img(image);
+
+    super.initState();
+    //img(image);
+  }
+
+  MexicanCards(this.mexican);
+  String img(image) {
+    return image;
+  }
+
+  // Function ontap(){
+  //   Navigator.of(context).push(MaterialPageRoute(builder:(_)=> EditProduct()));
+  // }
+  @override
+  Widget build(BuildContext context) {
+    return InkWell(
+      // onTap: ontap,
+      child: Container(
+          color: Colors.white,
+          height: MediaQuery.of(context).size.height / 4.0,
+          width: MediaQuery.of(context).size.width / 1.2,
+          padding: EdgeInsets.all(10),
+          child: Container(
+              height: 150,
+              color: Colors.white,
+
+              // padding: EdgeInsets.all(12.0,),
+//                  height: MediaQuery.of(context).size.height,
+//                  decoration: BoxDecoration(
+//
+//                    color: Colors.white,
+//                  ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: <Widget>[
+                  Row(
+                    children: [
+                      Padding(
+                        padding: EdgeInsets.only(left: 0.0, top: 5),
+                        child: Container(
+                          height: 85,
+                          width: 85,
+                          decoration: BoxDecoration(
+                              image: DecorationImage(
+                            image: AssetImage(
+                              mexican.image,
+                            ),
+                          )),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 5),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              mexican.name,
+                              style: AppFonts.monm,
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(
+                                top: 4.0,
+                              ),
+                              child: Text(
+                                mexican.price,
+                                textAlign: TextAlign.left,
+                                style: AppFonts.monm,
+                              ),
+                            ),
+                            Row(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 20),
+                                  child: Container(
+                                    height: 25,
+                                    width: 80,
+                                    decoration: BoxDecoration(
+                                        color: Colors.black12,
+                                        borderRadius:
+                                            BorderRadius.circular(15)),
+                                    child: Column(
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceEvenly,
+                                          children: [
+                                            Text(
+                                              '1 kg',
+                                              style: AppFonts.monr,
+                                            ),
+                                            Icon(
+                                              Icons.keyboard_arrow_down,
+                                              color: Colors.green[500],
+                                            )
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                // Spacer(),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      Spacer(),
+
+                      Padding(
+                        padding: const EdgeInsets.only(top: 75),
+                        child: Container(
+                          height: 40,
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.green[500]),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+
+                          child: Row(
+                            children: <Widget>[
+                              _itemCount != 0
+                                  ? new IconButton(
+                                icon: new Icon(Icons.remove),
+                                onPressed: () =>
+                                    setState(() => _itemCount--),)
+                                  : new Container(),
+                              _itemCount != 0 ? new Text(
+                                  _itemCount.toString()) : new Container(),
+                              new IconButton(icon: new Icon(Icons.add),
+                                  onPressed: () =>
+                                      setState(() => _itemCount++))
+                              ,
+                            ],
+                          ),
+                        ),
+                      ),
+
+                    ],
+                  ),
+                ],
+              ))),
+    );
+  }
+}
