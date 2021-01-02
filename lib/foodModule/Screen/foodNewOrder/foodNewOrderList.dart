@@ -82,7 +82,7 @@ class _foodNewOrderListPageState extends State<foodNewOrderList> {
       waitforresponse();
     }
 
-    if(usertoken != null && bool && type == 'grocery') {
+    if(usertoken != null && bool && type == 'grocery'){
       bool = false;
       API.orderinprogessfood(groceryinprogress + userid, type);
       waitforresponse();

@@ -354,7 +354,7 @@ Widget appbar(){
                     child: Card(
                       child: InkWell(
                         child: Column(
-                          //mainAxisAlignment: MainAxisAlignment.center,
+
                           children: [
                             SizedBox(height: 10,),
                             _filteredList[index].image == null ?
@@ -415,4 +415,5 @@ Widget appbar(){
       ),
     );
   }
+
 }

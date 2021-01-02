@@ -1,4 +1,6 @@
 
+import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:norwayfinalcustomer/Models/adduserlocation.dart';
 import 'package:norwayfinalcustomer/Models/foodvendorsmodel.dart';
@@ -16,23 +18,8 @@ class API {
   static var success = "false";
   static var items1;
 
-  static checkout(
-      var url,
-      var userId,
-      var vendorId,
-      var totalPrice,
-      var tax,
-      var instruction,
-      var paymentMethod,
-      var cardNumber,
-      var expiryMonth,
-      var expiryYear,
-      var cvc,
-      var items,
-      var rider_type,
-      var lat,
-      var lng,
-      var addr) {
+  static checkout(var url, var userId, var vendorId, var totalPrice, var tax, var instruction, var paymentMethod, var cardNumber,
+      var expiryMonth, var expiryYear, var cvc, var items, var rider_type, var lat, var lng, var addr) {
     items1 = new List();
     items1 = items;
     success = "false";
@@ -74,22 +61,25 @@ class API {
       else{
         print(response.statusCode );
       }
-
       //print(response.data);
-    }).catchError(_handleDioErrorsignup);
+    }).catchError((e){
+      if(e.error is SocketException){
+        checkout(url, userId, vendorId, totalPrice, tax, instruction, paymentMethod, cardNumber, expiryMonth, expiryYear, cvc, items, rider_type, lat, lng, addr);
+      }
+      else{
+        success = "error";
+      }
+    });
   }
 
-  static login(
-    var url,
-    var email,
-    var pass,
-  ) {
+  static login(var url, var email, var pass,) {
     success = "false";
     Dio dio = new Dio();
 
     FormData formData = new FormData.fromMap({
       'email': email,
       'password': pass,
+      'role': 'user',
     });
     dio
         .post(
@@ -133,17 +123,17 @@ class API {
         success = "error";
         throw Exception('Failed to Fetch Vendors');
       }
-    }).catchError(_handleDioErrorsignup);
+    }).catchError((e){
+      if(e.error is SocketException){
+        login( url,  email,  pass,);
+      }
+      else{
+        success = "error";
+      }
+    });
   }
 
-  static adduserloc(
-      var url,
-      var title,
-      var address,
-      var latitude,
-      var longitude,
-      var user_id,
-      ) {
+  static adduserloc(var url, var title, var address, var latitude, var longitude, var user_id,) {
     success = "false";
     Dio dio = new Dio();
 
@@ -192,7 +182,15 @@ class API {
         internetspeedtoast();
         throw Exception('Failed to Fetch Vendors');
       }
-    }).catchError(_handleDioErrorsignup);
+    }).catchError((e){
+      if(e.error is SocketException){
+        adduserloc( url,  title,  address,  latitude,  longitude,  user_id,);
+      }
+      else{
+        success = "error";
+      }
+    });
+        //catchError(_handleDioErrorsignup);
   }
 
   static getuseloc(var url){
@@ -220,7 +218,15 @@ class API {
         }
 
       }
-    }).catchError(_handleDioError);
+    }).catchError((e){
+      if(e.error is SocketException){
+        getuseloc( url);
+      }
+      else{
+        success = "true";
+      }
+    });
+
 
   }
 
@@ -249,7 +255,15 @@ class API {
         }
 
       }
-    }).catchError(_handleDioError);
+    }).catchError((e){
+      if(e.error is SocketException){
+        deleteuserloc( url);
+      }
+      else{
+        success = "true";
+      }
+    });
+        //.catchError(_handleDioError);
   }
 
   static signup(var url, var name, var email, var pass, var phone) {
@@ -262,6 +276,7 @@ class API {
       'phone': phone,
       'email': email,
       'password': pass,
+      'role': 'user',
     });
     dio
         .post(
@@ -287,9 +302,16 @@ class API {
         success = "error";
         throw Exception('Failed to Fetch Vendors');
       }
-    }).catchError(_handleDioErrorsignup);
+    }).catchError((e){
+      if(e.error is SocketException){
+        signup( url,  name,  email,  pass,  phone);
+      }
+      else{
+        success = "error";
+      }
+    });
+        //.catchError(_handleDioErrorsignup);
   }
-
 
   static profileedit(var url, var name, var pass, var phone, var image) async {
     success = "false";
@@ -331,46 +353,61 @@ class API {
       SplashTest.sharedPreferences.setString("userimage", userimage.toString());
 
       success = "true";
-    }).catchError(_handleDioErrorsignup);
+    }).catchError((e){
+      if(e.error is SocketException){
+        profileedit( url,  name,  pass,  phone,  image);
+      }
+      else{
+        success = "error";
+      }
+    });
+        //.catchError(_handleDioErrorsignup);
   }
 
   static allfoodvendors(var vendorUrl) {
     success = "false";
     globalvendors.clear();
     Dio dio = new Dio();
-    dio.get(vendorUrl).then((response) {
-      if (response.statusCode == 200) {
-        Map<String, dynamic> data = response.data;
-        var records = data['success']['records'];
+      dio.get(vendorUrl).then((response) {
+        if (response.statusCode == 200) {
+          Map<String, dynamic> data = response.data;
+          var records = data['success']['records'];
 
-        for (Map i in records) {
-          print(i['locations']);
-          var loc = i['locations'];
-          var add , la, ln;
-          for(Map j in loc){
-            add = j['address'].toString();
-            la = j['latitude'].toString();
-            ln = j['longitude'].toString();
+          for (Map i in records) {
+            print(i['locations']);
+            var loc = i['locations'];
+            var add , la, ln;
+            for(Map j in loc){
+              add = j['address'].toString();
+              la = j['latitude'].toString();
+              ln = j['longitude'].toString();
+            }
+            if (i['detail']['status'] == 1) {
+              globalvendors.add(FoodVendors(
+                id: i['id'],
+                image: i['detail']["image"],
+                name: i['name'],
+                address: add.toString(),
+                totalReviews: i['totalReviews'],
+                avgRating: i['avgRating'],
+                lat: la.toString(),
+                lng: ln.toString(),
+              ));
+            }
           }
-          if (i['detail']['status'] == 1) {
-            globalvendors.add(FoodVendors(
-              id: i['id'],
-              image: i['detail']["image"],
-              name: i['name'],
-              address: add.toString(),
-              totalReviews: i['totalReviews'],
-              avgRating: i['avgRating'],
-              lat: la.toString(),
-              lng: ln.toString(),
-            ));
-          }
+          success = "true";
+        } else {
+          success = "true";
+          throw Exception('Failed to Fetch Vendors');
         }
-        success = "true";
-      } else {
-        success = "true";
-        throw Exception('Failed to Fetch Vendors');
-      }
-    });
+      }).catchError((e){
+        if(e.error is SocketException){
+          allfoodvendors(vendorUrl);
+        }
+        else{
+          success = 'true';
+        }
+      });
   }
 
   static orderinprogessfood(var url, var type) {
@@ -383,13 +420,6 @@ class API {
         var records = data['success'];
         for (Map i in records) {
           var payment;
-          var loc = i['details']['vendor']['locations'];
-          var add , la, ln;
-          for(Map j in loc){
-            add = j['address'].toString();
-            la = j['latitude'].toString();
-            ln = j['longitude'].toString();
-          }
           if (i['payment_method'] == 'cod') {
             payment = 'Cash on delivery';
           } else if (i['payment_method'] == 'card') {
@@ -397,23 +427,27 @@ class API {
           } else {
             payment = 'Cash on delivery';
           }
+          var quantity = 0;
+          for(Map k in i['details']){
+            quantity += int.parse(k['quantity'].toString());
+          }
           globalorderinprogressfood.add(FoodNewOrder(
               orderNo: i['id'],
               price: i['total_price'],
-              image: i['details'][type]['image'],
+              image: null,
               status: i['status'],
               date: i['created_at'],
-              items: i['details']['quantity'],
-              name: i['details'][type]['name'],
+              items: quantity,
+              name: null,
               payment: payment,
               useraddr: i['address'],
               userlat: i['latitude'],
               userlng: i['longitude'],
-              venadd: add,
-              venimg: i['details']['vendor']['detail']['image'],
-              venlat: la,
-              venlng: ln,
-              venname: i['details']['vendor']['name'],
+              venadd: i['details'][0]['vendor']['locations'][0]['address'],
+              venimg: i['details'][0]['vendor']['detail']['image'],
+              venlat: i['details'][0]['vendor']['locations'][0]['latitude'],
+              venlng: i['details'][0]['vendor']['locations'][0]['longitude'],
+              venname: i['details'][0]['vendor']['name'],
               instr: i['instruction'],
               tax: i['tax'],
           ));
@@ -423,7 +457,14 @@ class API {
         success = "true";
         throw Exception('Failed to Fetch inprogress orders');
       }
-    }).catchError(_handleDioError);
+    }).catchError((error){
+      if(error.error is SocketException){
+        orderinprogessfood( url,  type);
+      }
+      else{
+        success = "true";
+      }
+    });
   }
 
   static comleteorder(var url) {
@@ -436,15 +477,28 @@ class API {
         Map<String, dynamic> data = response.data;
         var records = data['success'];
         for (Map i in records) {
+          var payment;
+          if (i['payment_method'] == 'cod') {
+            payment = 'Cash on delivery';
+          } else if (i['payment_method'] == 'card') {
+            payment = 'Credit Card';
+          } else {
+            payment = 'Cash on delivery';
+          }
+          var quantity = 0;
+          for(Map k in i['details']){
+            quantity += int.parse(k['quantity'].toString());
+          }
+
           globalcompleteorder.add(FoodPastOrders(
               orderNo: i['id'],
               price: i['total_price'],
-              image: i['details']['food']['image'],
+              image: i['details'][0]['vendor']['detail']['image'],
               status: i['status'],
               date: i['created_at'],
-              items: i['details']['quantity'],
-              name: i['details']['food']['name'],
-              payment: "Cash on delivery"));
+              items: quantity,
+              name: i['details'][0]['vendor']['name'],
+              payment: payment));
         }
         success = "true";
       } else {
@@ -452,7 +506,15 @@ class API {
         success = "true";
         throw Exception('Failed to Fetch inprogress orders');
       }
-    }).catchError(_handleDioError);
+    }).catchError((e){
+      if(e.error is SocketException){
+        comleteorder( url);
+      }
+      else{
+        success = "true";
+      }
+    });
+        //.catchError(_handleDioError);
   }
 
   static vendorProducts(var vendorUrl) async {
@@ -463,7 +525,6 @@ class API {
     dio.get(vendorUrl).then((response) {
       globalproductType.clear();
       if (response.statusCode == 200) {
-        globalproductType.clear();
         Map<String, dynamic> data = response.data;
         if (data['error'] != null) {
           success = 'true';
@@ -475,16 +536,21 @@ class API {
           for (Map i in records) {
             globalproduct = new List();
             for (Map j in i['products']) {
-              globalproduct.add(Products(
-                id: j['id'],
-                name: j['name'],
-                image: j['image'],
-                price: j['price'],
-                quantity: j['quantity'],
-                orderquantity: 0,
-                vendorid: vendorid,
-                vendorname: vendorname,
-              ));
+
+              if(j['status']==1)
+                {
+                  globalproduct.add(Products(
+                    id: j['id'],
+                    name: j['name'],
+                    image: j['image'],
+                    price: j['price'],
+                    quantity: j['quantity'],
+                    orderquantity: 0,
+                    vendorid: vendorid,
+                    vendorname: vendorname,
+                  ));
+                }
+
             }
             globalproductType.add(ProductType(
               name: i['name'],
@@ -501,7 +567,16 @@ class API {
         success = "true";
         throw Exception('Failed to Fetch Vendors Products');
       }
-    }).catchError(_handleDioError);
+    }).catchError((e){
+      if(e.error is SocketException){
+        vendorProducts( vendorUrl);
+      }
+      else{
+        success = "true";
+      }
+    });
+
+        //.catchError(_handleDioError);
   }
 
   static vendorreviews(var vendorUrl) async {
@@ -533,16 +608,15 @@ class API {
         internetspeedtoast();
         throw Exception('Failed to Fetch Vendors Products');
       }
-    }).catchError(_handleDioError);
+    }).catchError((e){
+      if(e.error is SocketException){
+        vendorreviews( vendorUrl);
+      }
+      else{
+        success = "true";
+      }
+    });
+        //.catchError(_handleDioError);
   }
 
-  static _handleDioError(dynamic error) {
-    success = "true";
-    throw Exception('Failed to Fetch Vendors Products');
-  }
-
-  static _handleDioErrorsignup(dynamic error) {
-    success = "error";
-    throw Exception('Failed to Fetch Vendors Products');
-  }
 }

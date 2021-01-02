@@ -129,14 +129,12 @@ class _SelectTypeState extends State<SelectType> {
                     ),
                   ),
                   onTap: (){
-
                     if(clickstatus)
                       {
                         clickstatus=false;
                         API.allfoodvendors(FoodvendorAPI);
                         waittofetchvendors();
                       }
-
                   },
                 ),
               ),

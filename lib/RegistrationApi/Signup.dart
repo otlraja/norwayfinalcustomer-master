@@ -110,8 +110,8 @@ class _SignupState extends State<Signupapi> {
             decoration: new BoxDecoration(
                 gradient: new LinearGradient(
                     colors: [
-                      Colors.black87,
-                      AppColors.silver,
+                      Colors.black,
+                      Colors.black,
 
                     ],
                     stops: [0.0, 1.0],

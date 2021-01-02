@@ -72,10 +72,9 @@ class FoodNewOrdercards extends State<FoodNewOrderCard> {
                     width: size.width / 6,
                     child: Padding(
                       padding: const EdgeInsets.only(right: 4.0),
-                      child: foodNewOrder.image != null ?
+                      child: foodNewOrder.venimg != null ?
                       Image.network(
-                        foodNewOrder.image.toString(),
-
+                        foodNewOrder.venimg.toString(),
                       ): Image.asset(
                         'assets/foodVector2.png',
                         fit: BoxFit.fill,
@@ -95,7 +94,7 @@ class FoodNewOrdercards extends State<FoodNewOrderCard> {
                         Container(
                           width: size.width / 2.5,
                           child: Text(
-                            foodNewOrder.name,
+                            foodNewOrder.venname,
                             style: AppFonts.monm,
                           ),
                         ),

@@ -284,6 +284,23 @@ class _Food_HomeState extends State<Food_Home> with TickerProviderStateMixin {
     );
   }
 
+  waittofetchvendorsproducts() async {
+
+    await Future.delayed(const Duration(seconds: 1), () {
+      if (API.success == 'true') {
+        print('hogaya');
+        //_tabController = TabController(length: globalproductType.length, vsync: this);
+
+        setState(() {
+
+        });
+      } else {
+        waittofetchvendorsproducts();
+      }
+    });
+  }
+
+
   getfilteredlist(){
     List<Products> tmpList = new List<Products>();
     for(int i=0; i < globalproductType[index].product.length; i++) {
@@ -293,6 +310,21 @@ class _Food_HomeState extends State<Food_Home> with TickerProviderStateMixin {
       _vendorList = tmpList;
       _filteredList = _vendorList;
     });
+  }
+
+
+  getlist(){
+    if (type == "food") {
+      API.vendorProducts(FoodproductApi +
+          globalvendors[widget.index].id.toString());
+    } else if (type == "grocery") {
+      API.vendorProducts(GroceryProductApi +
+          globalvendors[widget.index].id.toString());
+    } else if (type == "store") {
+      API.vendorProducts(StoreProductApi +
+          globalvendors[widget.index].id.toString());
+    }
+    waittofetchvendorsproducts();
   }
 
   @override
@@ -495,7 +527,7 @@ class _Food_HomeState extends State<Food_Home> with TickerProviderStateMixin {
   }
 
   Widget build(BuildContext context) {
-
+    // getlist();
 
     if((filter.isNotEmpty)) {
       List<Products> tmpList = new List<Products>();
@@ -599,27 +631,27 @@ class _Food_HomeState extends State<Food_Home> with TickerProviderStateMixin {
                   InkWell(
                     onTap: () {
                       if(clickstatus)
-                        {
+                      {
 
-                          if(globalvendors[widget.index].totalReviews != 0) {
-                            clickstatus=false;
-                            if (type == "food") {
-                              API.vendorreviews(
-                                  vendorreviewsAPI + globalvendors[widget.index].id
-                                      .toString());
-                              waittofetchvendorsreviews(widget.index);
-                            }
-                            else if(type=="grocery"){
-                              API.vendorreviews(groceryvendorreviewsAPI+globalvendors[widget.index].id.toString());
-                              waittofetchvendorsreviews(widget.index);
-                            }
-                            else if(type=="store"){
-                              API.vendorreviews(storevendorreviewsAPI+globalvendors[widget.index].id.toString());
-                              waittofetchvendorsreviews(widget.index);
-                            }
-
+                        if(globalvendors[widget.index].totalReviews != 0) {
+                          clickstatus=false;
+                          if (type == "food") {
+                            API.vendorreviews(
+                                vendorreviewsAPI + globalvendors[widget.index].id
+                                    .toString());
+                            waittofetchvendorsreviews(widget.index);
                           }
+                          else if(type=="grocery"){
+                            API.vendorreviews(groceryvendorreviewsAPI+globalvendors[widget.index].id.toString());
+                            waittofetchvendorsreviews(widget.index);
+                          }
+                          else if(type=="store"){
+                            API.vendorreviews(storevendorreviewsAPI+globalvendors[widget.index].id.toString());
+                            waittofetchvendorsreviews(widget.index);
+                          }
+
                         }
+                      }
 
                     },
                     child: Container(
@@ -687,6 +719,7 @@ class _Food_HomeState extends State<Food_Home> with TickerProviderStateMixin {
               Expanded(
                 child: Container(
                   child: TabBarView(
+                    //controller: _tabController,
                     physics: NeverScrollableScrollPhysics(),
                     children: List.generate(
                       globalproductType.length,
@@ -704,325 +737,329 @@ class _Food_HomeState extends State<Food_Home> with TickerProviderStateMixin {
                           )
                               : Container(
                             width: MediaQuery.of(context).size.width,
-                            child: ListView.builder(
-                                padding: EdgeInsets.only(bottom: 60),
-                                scrollDirection: Axis.vertical,
-                                itemCount: _filteredList.length,
-                                itemBuilder: (_, index) {
-                                  return InkWell(
-                                    // onTap: ontap,
-                                    child: Container(
-                                        color: Colors.white,
-                                        padding: EdgeInsets.only(left: 10,right: 10,top: 10),
-                                        child: Column(
-                                          // mainAxisSize:
-                                          //     MainAxisSize.min,
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          crossAxisAlignment: CrossAxisAlignment.center,
-                                          children: <Widget>[
-                                            Row(
-                                              children: [
-                                                Padding(
-                                                  padding:
-                                                  EdgeInsets.only(
-                                                      left: 0.0,
-                                                      top: 5),
-                                                  child: Container(
-                                                    height: 85,
-                                                    width: 85,
-                                                    decoration:
-                                                    BoxDecoration(
-                                                        image:
-                                                        DecorationImage(
-                                                          fit:
-                                                          BoxFit.fill,
+                            child: RefreshIndicator(
+                              child: ListView.builder(
+                                  padding: EdgeInsets.only(bottom: 60),
+                                  scrollDirection: Axis.vertical,
+                                  itemCount: _filteredList.length,
+                                  itemBuilder: (_, index) {
+                                    return InkWell(
+                                      // onTap: ontap,
+                                      child: Container(
+                                          color: Colors.white,
+                                          padding: EdgeInsets.only(left: 10,right: 10,top: 10),
+                                          child: Column(
+                                            // mainAxisSize:
+                                            //     MainAxisSize.min,
+                                            mainAxisAlignment: MainAxisAlignment.center,
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            children: <Widget>[
+                                              Row(
+                                                children: [
+                                                  Padding(
+                                                    padding:
+                                                    EdgeInsets.only(
+                                                        left: 0.0,
+                                                        top: 5),
+                                                    child: Container(
+                                                      height: 85,
+                                                      width: 85,
+                                                      decoration:
+                                                      BoxDecoration(
                                                           image:
-                                                          NetworkImage(
-                                                            _filteredList[index]
-                                                                .image,
-                                                          ),
-                                                        )),
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding:
-                                                  const EdgeInsets
-                                                      .only(
-                                                      top: 5,
-                                                      left: 10),
-                                                  child: Column(
-                                                    mainAxisAlignment:
-                                                    MainAxisAlignment
-                                                        .start,
-                                                    crossAxisAlignment:
-                                                    CrossAxisAlignment
-                                                        .start,
-                                                    children: [
-                                                      Text(
-                                                          _filteredList[index]
-                                                              .name,
-                                                          style: AppFonts
-                                                              .monmblack),
-                                                      Padding(
-                                                        padding:
-                                                        EdgeInsets
-                                                            .only(
-                                                          top: 4.0,
-                                                        ),
-                                                        child: Text(
-                                                          "\$ " +
+                                                          DecorationImage(
+                                                            fit:
+                                                            BoxFit.fill,
+                                                            image:
+                                                            NetworkImage(
                                                               _filteredList[index]
-                                                                  .price
-                                                                  .toString(),
-                                                          textAlign:
-                                                          TextAlign
-                                                              .left,
-                                                          style: AppFonts
-                                                              .monrblack,
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                                Spacer(),
-                                                Padding(
-                                                  padding:
-                                                  const EdgeInsets
-                                                      .only(
-                                                      top: 50),
-                                                  child: Container(
-                                                    height: 40,
-                                                    decoration:
-                                                    BoxDecoration(
-                                                      border: Border.all(
-                                                          color: Colors
-                                                              .green[
-                                                          500]),
-                                                      borderRadius:
-                                                      BorderRadius
-                                                          .circular(
-                                                          20),
+                                                                  .image,
+                                                            ),
+                                                          )),
                                                     ),
-                                                    child: Row(
-                                                      children: <
-                                                          Widget>[
-                                                        _filteredList[index]
-                                                            .orderquantity !=
-                                                            0
-                                                            ? new IconButton(
-                                                          icon:
-                                                          new Icon(Icons.remove),
-                                                          onPressed: () =>
-                                                              setState(() {
-                                                                _filteredList[index].orderquantity--;
-                                                                var a;
-                                                                if(type == 'food'){
-                                                                  a = globalfoodcart.where((element) =>
-                                                                  element.id ==
-                                                                      _filteredList[index].id);
-
-                                                                  globalfoodcart.remove(a.first);
-                                                                }
-                                                                else if(type == 'grocery'){
-                                                                  a = globalgrocerycart.where((element) =>
-                                                                  element.id ==
-                                                                      _filteredList[index].id);
-
-                                                                  globalgrocerycart.remove(a.first);
-                                                                }
-                                                                else if(type == 'store'){
-                                                                  a = globalstorecart.where((element) =>
-                                                                  element.id ==
-                                                                      _filteredList[index].id);
-
-                                                                  globalstorecart.remove(a.first);
-                                                                }
-
-                                                                globalproductType[i].product[index].quantityoncheckout =
-                                                                    a.length - 1;
-
-                                                                calculateprice();
-
-                                                                if(type == 'food'){
-                                                                  SplashTest.sharedPreferences.setString("cartprice",
-                                                                      cartprice.toString());
-                                                                  final String
-                                                                  encodedData =
-                                                                  Products.encodeMusics(globalfoodcart);
-                                                                  SplashTest.sharedPreferences.setString("foodcart",
-                                                                      encodedData);
-                                                                  Food_Home.carttext();
-                                                                }
-                                                                else if(type == 'grocery'){
-
-                                                                  SplashTest.sharedPreferences.setString("grocerycartprice",
-                                                                      grocerycartprice.toString());
-                                                                  final String
-                                                                  encodedData =
-                                                                  Products.encodeMusics(globalgrocerycart);
-                                                                  SplashTest.sharedPreferences.setString("grocerycart",
-                                                                      encodedData);
-                                                                  Food_Home.carttext();
-                                                                }
-                                                                else if(type == 'store'){
-                                                                  SplashTest.sharedPreferences.setString("storecartprice",
-                                                                      storecartprice.toString());
-                                                                  final String
-                                                                  encodedData =
-                                                                  Products.encodeMusics(globalstorecart);
-                                                                  SplashTest.sharedPreferences.setString("storecart",
-                                                                      encodedData);
-                                                                  Food_Home.carttext();
-                                                                }
-                                                                //}
-                                                              }),
-                                                        )
-                                                            : new Container(),
-                                                        _filteredList[
-                                                        index]
-                                                            .orderquantity !=
-                                                            0
-                                                            ? new Text(_filteredList[
-                                                        index]
-                                                            .orderquantity
-                                                            .toString())
-                                                            : new Container(),
-                                                        new IconButton(
-                                                            icon: new Icon(
-                                                                Icons.add),
-                                                            onPressed:
-                                                                () {
-                                                              var setcart;
-
-                                                              if(type == 'food'){
-                                                                setcart = globalfoodcart;
-                                                              }
-                                                              else if(type == 'grocery'){
-                                                                setcart = globalgrocerycart;
-
-                                                              }
-                                                              else if(type == 'store'){
-
-                                                               setcart = globalstorecart;
-
-                                                              }
-
-                                                              if( setcart.isEmpty || setcart[0].vendorid.toString() == vendorid.toString())
-                                                              {
-                                                                setState(
-                                                                        () {
-                                                                          _filteredList[index]
-                                                                          .orderquantity++;
-
-                                                                      var a;
-
-                                                                      if(type == 'food'){
-                                                                        globalfoodcart
-                                                                            .add(_filteredList[index]);
-
-                                                                        a = globalfoodcart.where((element) =>
-                                                                        element.id ==
-                                                                            _filteredList[index].id);
-
-                                                                      }
-                                                                      else if(type == 'grocery'){
-
-                                                                        globalgrocerycart
-                                                                            .add(_filteredList[index]);
-
-                                                                        a = globalgrocerycart.where((element) =>
-                                                                        element.id ==
-                                                                            _filteredList[index].id);
-                                                                      }
-                                                                      else if(type == 'store'){
-
-                                                                        globalstorecart
-                                                                            .add(_filteredList[index]);
-
-                                                                        a = globalstorecart.where((element) =>
-                                                                        element.id ==
-                                                                            _filteredList[index].id);
-
-                                                                      }
-
-                                                                      if (a.length !=
-                                                                          0) {
-                                                                        _filteredList[index].quantityoncheckout =
-                                                                            a.length;
-                                                                      }
-                                                                      calculateprice();
-                                                                      if(type == 'food'){
-
-                                                                        SplashTest.sharedPreferences.setString(
-                                                                            "cartprice",
-                                                                            cartprice.toString());
-
-                                                                        final String
-                                                                        encodedData =
-                                                                        Products.encodeMusics(globalfoodcart);
-                                                                        SplashTest.sharedPreferences.setString(
-                                                                            "foodcart",
-                                                                            encodedData);
-
-                                                                        Food_Home.carttext();
-                                                                      }
-                                                                      else if(type == 'grocery'){
-
-
-                                                                        SplashTest.sharedPreferences.setString(
-                                                                            "grocerycartprice",
-                                                                            grocerycartprice.toString());
-
-                                                                        final String
-                                                                        encodedData =
-                                                                        Products.encodeMusics(globalgrocerycart);
-                                                                        SplashTest.sharedPreferences.setString(
-                                                                            "grocerycart",
-                                                                            encodedData);
-
-                                                                        Food_Home.carttext();
-
-                                                                      }
-                                                                      else if(type == 'store'){
-
-
-                                                                        SplashTest.sharedPreferences.setString(
-                                                                            "storecartprice",
-                                                                            storecartprice.toString());
-
-                                                                        final String
-                                                                        encodedData =
-                                                                        Products.encodeMusics(globalstorecart);
-                                                                        SplashTest.sharedPreferences.setString(
-                                                                            "storecart",
-                                                                            encodedData);
-
-                                                                        Food_Home.carttext();
-
-                                                                      }
-
-                                                                    }
-                                                                  //}
-                                                                );
-                                                              }
-                                                              else{
-                                                                showAlertDialogcart();
-                                                              }
-
-                                                            }),
+                                                  ),
+                                                  Padding(
+                                                    padding:
+                                                    const EdgeInsets
+                                                        .only(
+                                                        top: 5,
+                                                        left: 10),
+                                                    child: Column(
+                                                      mainAxisAlignment:
+                                                      MainAxisAlignment
+                                                          .start,
+                                                      crossAxisAlignment:
+                                                      CrossAxisAlignment
+                                                          .start,
+                                                      children: [
+                                                        Text(
+                                                            _filteredList[index]
+                                                                .name,
+                                                            style: AppFonts
+                                                                .monmblack),
+                                                        Padding(
+                                                          padding:
+                                                          EdgeInsets
+                                                              .only(
+                                                            top: 4.0,
+                                                          ),
+                                                          child: Text(
+                                                            "\$ " +
+                                                                _filteredList[index]
+                                                                    .price
+                                                                    .toString(),
+                                                            textAlign:
+                                                            TextAlign
+                                                                .left,
+                                                            style: AppFonts
+                                                                .monrblack,
+                                                          ),
+                                                        ),
                                                       ],
                                                     ),
                                                   ),
-                                                ),
-                                              ],
-                                            ),
-                                            Divider(
-                                              thickness: 1,
-                                            ),
-                                          ],
-                                        )),
-                                  );
-                                }),
+                                                  Spacer(),
+                                                  Padding(
+                                                    padding:
+                                                    const EdgeInsets
+                                                        .only(
+                                                        top: 50),
+                                                    child: Container(
+                                                      height: 40,
+                                                      decoration:
+                                                      BoxDecoration(
+                                                        border: Border.all(
+                                                            color: Colors
+                                                                .green[
+                                                            500]),
+                                                        borderRadius:
+                                                        BorderRadius
+                                                            .circular(
+                                                            20),
+                                                      ),
+                                                      child: Row(
+                                                        children: <
+                                                            Widget>[
+                                                          _filteredList[index]
+                                                              .orderquantity !=
+                                                              0
+                                                              ? new IconButton(
+                                                            icon:
+                                                            new Icon(Icons.remove),
+                                                            onPressed: () =>
+                                                                setState(() {
+                                                                  _filteredList[index].orderquantity--;
+                                                                  var a;
+                                                                  if(type == 'food'){
+                                                                    a = globalfoodcart.where((element) =>
+                                                                    element.id ==
+                                                                        _filteredList[index].id);
+
+                                                                    globalfoodcart.remove(a.first);
+                                                                  }
+                                                                  else if(type == 'grocery'){
+                                                                    a = globalgrocerycart.where((element) =>
+                                                                    element.id ==
+                                                                        _filteredList[index].id);
+
+                                                                    globalgrocerycart.remove(a.first);
+                                                                  }
+                                                                  else if(type == 'store'){
+                                                                    a = globalstorecart.where((element) =>
+                                                                    element.id ==
+                                                                        _filteredList[index].id);
+
+                                                                    globalstorecart.remove(a.first);
+                                                                  }
+
+                                                                  globalproductType[i].product[index].quantityoncheckout =
+                                                                      a.length - 1;
+
+                                                                  calculateprice();
+
+                                                                  if(type == 'food'){
+                                                                    SplashTest.sharedPreferences.setString("cartprice",
+                                                                        cartprice.toString());
+                                                                    final String
+                                                                    encodedData =
+                                                                    Products.encodeMusics(globalfoodcart);
+                                                                    SplashTest.sharedPreferences.setString("foodcart",
+                                                                        encodedData);
+                                                                    Food_Home.carttext();
+                                                                  }
+                                                                  else if(type == 'grocery'){
+
+                                                                    SplashTest.sharedPreferences.setString("grocerycartprice",
+                                                                        grocerycartprice.toString());
+                                                                    final String
+                                                                    encodedData =
+                                                                    Products.encodeMusics(globalgrocerycart);
+                                                                    SplashTest.sharedPreferences.setString("grocerycart",
+                                                                        encodedData);
+                                                                    Food_Home.carttext();
+                                                                  }
+                                                                  else if(type == 'store'){
+                                                                    SplashTest.sharedPreferences.setString("storecartprice",
+                                                                        storecartprice.toString());
+                                                                    final String
+                                                                    encodedData =
+                                                                    Products.encodeMusics(globalstorecart);
+                                                                    SplashTest.sharedPreferences.setString("storecart",
+                                                                        encodedData);
+                                                                    Food_Home.carttext();
+                                                                  }
+                                                                  //}
+                                                                }),
+                                                          )
+                                                              : new Container(),
+                                                          _filteredList[
+                                                          index]
+                                                              .orderquantity !=
+                                                              0
+                                                              ? new Text(_filteredList[
+                                                          index]
+                                                              .orderquantity
+                                                              .toString())
+                                                              : new Container(),
+                                                          new IconButton(
+                                                              icon: new Icon(
+                                                                  Icons.add),
+                                                              onPressed:
+                                                                  () {
+                                                                var setcart;
+
+                                                                if(type == 'food'){
+                                                                  setcart = globalfoodcart;
+                                                                }
+                                                                else if(type == 'grocery'){
+                                                                  setcart = globalgrocerycart;
+
+                                                                }
+                                                                else if(type == 'store'){
+
+                                                                  setcart = globalstorecart;
+
+                                                                }
+
+                                                                if( setcart.isEmpty || setcart[0].vendorid.toString() == vendorid.toString())
+                                                                {
+                                                                  setState(
+                                                                          () {
+                                                                        _filteredList[index]
+                                                                            .orderquantity++;
+
+                                                                        var a;
+
+                                                                        if(type == 'food'){
+                                                                          globalfoodcart
+                                                                              .add(_filteredList[index]);
+
+                                                                          a = globalfoodcart.where((element) =>
+                                                                          element.id ==
+                                                                              _filteredList[index].id);
+
+                                                                        }
+                                                                        else if(type == 'grocery'){
+
+                                                                          globalgrocerycart
+                                                                              .add(_filteredList[index]);
+
+                                                                          a = globalgrocerycart.where((element) =>
+                                                                          element.id ==
+                                                                              _filteredList[index].id);
+                                                                        }
+                                                                        else if(type == 'store'){
+
+                                                                          globalstorecart
+                                                                              .add(_filteredList[index]);
+
+                                                                          a = globalstorecart.where((element) =>
+                                                                          element.id ==
+                                                                              _filteredList[index].id);
+
+                                                                        }
+
+                                                                        if (a.length !=
+                                                                            0) {
+                                                                          _filteredList[index].quantityoncheckout =
+                                                                              a.length;
+                                                                        }
+                                                                        calculateprice();
+                                                                        if(type == 'food'){
+
+                                                                          SplashTest.sharedPreferences.setString(
+                                                                              "cartprice",
+                                                                              cartprice.toString());
+
+                                                                          final String
+                                                                          encodedData =
+                                                                          Products.encodeMusics(globalfoodcart);
+                                                                          SplashTest.sharedPreferences.setString(
+                                                                              "foodcart",
+                                                                              encodedData);
+
+                                                                          Food_Home.carttext();
+                                                                        }
+                                                                        else if(type == 'grocery'){
+
+
+                                                                          SplashTest.sharedPreferences.setString(
+                                                                              "grocerycartprice",
+                                                                              grocerycartprice.toString());
+
+                                                                          final String
+                                                                          encodedData =
+                                                                          Products.encodeMusics(globalgrocerycart);
+                                                                          SplashTest.sharedPreferences.setString(
+                                                                              "grocerycart",
+                                                                              encodedData);
+
+                                                                          Food_Home.carttext();
+
+                                                                        }
+                                                                        else if(type == 'store'){
+
+
+                                                                          SplashTest.sharedPreferences.setString(
+                                                                              "storecartprice",
+                                                                              storecartprice.toString());
+
+                                                                          final String
+                                                                          encodedData =
+                                                                          Products.encodeMusics(globalstorecart);
+                                                                          SplashTest.sharedPreferences.setString(
+                                                                              "storecart",
+                                                                              encodedData);
+
+                                                                          Food_Home.carttext();
+
+                                                                        }
+
+                                                                      }
+                                                                    //}
+                                                                  );
+                                                                }
+                                                                else{
+                                                                  showAlertDialogcart();
+                                                                }
+
+                                                              }),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              Divider(
+                                                thickness: 1,
+                                              ),
+                                            ],
+                                          )),
+                                    );
+                                  }),
+                              onRefresh: _refreshLocalGallery,
+                              color: Colors.green,
+                            ),
                           ),
                         ),
                       ),
@@ -1088,5 +1125,9 @@ class _Food_HomeState extends State<Food_Home> with TickerProviderStateMixin {
         ),
       ),
     );
+  }
+  Future<Null> _refreshLocalGallery() async{
+    getlist();
+    print("hehehheh hahahah");
   }
 }

@@ -106,8 +106,8 @@ set(){}
             decoration: new BoxDecoration(
                 gradient: new LinearGradient(
                     colors: [
-                      Colors.black87,
-                      AppColors.silver,
+                      Colors.black,
+                      Colors.black,
 
                     ],
                     stops: [0.0, 1.0],
@@ -226,7 +226,7 @@ set(){}
 
                         children: [
 
-                          Text('Not have an account?'),
+                          Text('Not have an account?', style: TextStyle(color: Colors.white)),
 
                           InkWell(
                             onTap: (){
@@ -234,7 +234,7 @@ set(){}
                                   .push(MaterialPageRoute(builder: (_) => Signupapi()));
                             },
 
-                              child:Text(' Signup',style: TextStyle(fontSize: 15, fontWeight:FontWeight.w500 ),),
+                              child:Text(' Signup',style: TextStyle(fontSize: 15, fontWeight:FontWeight.w500 , color: Colors.white),),
 
                           ),
                         ],
